@@ -26,13 +26,3 @@ for key, value in note.items():
 def format_date_without_year(date_str):
     date_obj = datetime.strptime(date_str, "%d-%m-%Y")
     return date_obj.strftime("%d-%m")
-
-
-
-
-
-
-for index, title_list in enumerate(note[5], start=1):
-    print(f"\tЗаголовок {index}: {title_list}")
-
-
