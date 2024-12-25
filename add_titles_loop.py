@@ -19,12 +19,6 @@ note['Дата создания заметки: '] = created_date
 note['Дата истечения заметки (дедлайн): '] = issue_date
 note['Заголовки: '] = title_list
 
-# Функция для изменения статуса заметки
-def update_status(note):
-    new_status = input("Введите новый статус заметки ('новая', 'в процессе', 'завершенная'): ")
-    note['status'] = new_status
-    return note
-
 # Создадим цикл, чтобы пользователь сам выбирал количество заголовков
 while True:
     title = input("Введите заголовок (или оставьте пустым для завершения ввода): ")
@@ -37,15 +31,6 @@ print("\nЗаметка:")
 for key, value in note.items():
     print(f"{key}: {value}")
 
-# Добавим возможность изменить статус заметки
-update_choice = input("\nХотите изменить статус заметки? (да/нет): ").lower()
-if update_choice == 'да':
-    note = update_status(note)
-
-# Выводим обновленную заметку
-print("\nОбновленная заметка:")
-for key, value in note.items():
-    print(f"{key}: {value}")
 
 # Изменим вывод даты с формата ДД-ММ-ГГ в формат ДД-ММ
 def format_date_without_year(date_str):
