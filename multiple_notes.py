@@ -1,179 +1,168 @@
-from datetime import datetime
-import json
-import os
+import datetime
 
 
-def get_user_input(): # Функция для ввода данных от пользователя
+def create_note(note_id):
+
+    # Функция для создания новой заметки.
+
     note = {}
-    note['username'] = input("Введите имя пользователя: ")
-    note['title'] = input("Введите название заметки: ")
-    note['description'] = input("Введите описание заметки: ")
-
-    # Ввод даты
-    while True:
-        try:
-            created_date = input("Введите дату создания (формат: DD.MM.YYYY): ")
-            note['created_date'] = created_date
-
-            deadline_date = input("Введите дату завершения (формат: DD.MM.YYYY): ")
-            note['deadline_date'] = deadline_date
-            # Проверка формата дат
-            datetime.strptime(created_date, '%d.%m.%Y')
-            datetime.strptime(deadline_date, '%d.%m.%Y')
-            break
-        except ValueError:
-            print("Неверный формат даты. Попробуйте снова.")
-
-    # Ввод заголовков
-    headers = []
-    while True:
-        header = input("Введите заголовок (или 'готово' для завершения): ")
-        if header.lower() == 'готово':
-            break
-        headers.append(header)
-    note['headers'] = headers
+    note['id'] = note_id
+    note['user_name'] = input("Введите имя пользователя: ")
 
     # Выбор статуса
-    statuses = ['выполнено', 'в процессе', 'отложено']
+    note['status'] = get_status()
+
+    note['description'] = input("Введите описание заметки: ")
+
+    # Получаем дату создания от пользователя
+    note['creation_date'] = get_creation_date()
+
+    # Получаем дату завершения от пользователя
+    note['end_date'] = get_end_date()
+
+    # Заголовки
+    note['headers'] = []
+    print("Введите заголовки (нажмите Enter, чтобы закончить):")
     while True:
-        print("\nДоступные статусы:")
-        for i, status in enumerate(statuses, 1):
-            print(f"{i}. {status}")
-        try:
-            choice = int(input("Выберите статус (1-3): "))
-            if 1 <= choice <= 3:
-                note['status'] = statuses[choice - 1]
-                break
-        except ValueError:
-            pass
-        print("Неверный выбор. Попробуйте снова.")
+        header = input("> ")
+        if not header:
+            break
+        note['headers'].append(header)
 
     return note
 
 
-def load_notes(): # Функция для сохранения заметки в файл
-    if os.path.exists('notes.json'):
-        with open('notes.json', 'r', encoding='utf-8') as file:
-            try:
-                return json.load(file)
-            except json.JSONDecodeError:
-                return []
-    return []
+def get_status():
+
+    # Функция для получения статуса заметки.
+
+    while True:
+        print("Выберите статус заметки:")
+        print("1. Отложено")
+        print("2. В процессе")
+        print("3. Выполнено")
+        choice = input("> ")
+        if choice == '1':
+            return "Отложено"
+        elif choice == '2':
+            return "В процессе"
+        elif choice == '3':
+            return "Выполнено"
+        else:
+            print("Неверный выбор. Попробуйте снова.")
+
+def get_creation_date():
+
+    # Функция для получения даты создания заметки от пользователя.
+
+    while True:
+        date_str = input("Введите дату создания заметки (дд-мм-гггг): ")
+        try:
+            date_obj = datetime.datetime.strptime(date_str, "%d-%m-%Y")
+            return date_obj.strftime("%d-%m")  # Форматируем дату в дд-мм для хранения
+        except ValueError:
+            print("Неверный формат даты. Используйте дд-мм-гггг")
 
 
-def save_notes(notes): # Функция для сохранения заметки
-    with open('notes.json', 'w', encoding='utf-8') as file:
-        json.dump(notes, file, ensure_ascii=False, indent=2)
+def get_end_date():
+
+    # Функция для получения даты завершения заметки от пользователя.
+
+    while True:
+        date_str = input("Введите дату завершения заметки (дд-мм-гггг): ")
+        try:
+            date_obj = datetime.datetime.strptime(date_str, "%d-%m-%Y")
+            return date_obj.strftime("%d-%m")  # Форматируем дату в дд-мм для хранения
+        except ValueError:
+            print("Неверный формат даты. Используйте дд-мм-гггг")
 
 
-def display_note(note): # Функция для вывода полученных данных
-    print("\nИнформация о заметке:")
-    print(f"Пользователь: {note['username']}")
-    print(f"Название: {note['title']}")
-    print(f"Описание: {note['description']}")
-    print(f"Дата создания: {note['created_date']}")
-    print(f"Дедлайн: {note['deadline_date']}")
-    print("Заголовки:", ", ".join(note['headers']))
+def display_note(note):
+
+    # Функция для вывода информации о заметке на экран.
+
+    print(f"Номер заметки: {note['id']}")
+    print(f"Имя пользователя: {note['user_name']}")
     print(f"Статус: {note['status']}")
+    print(f"Описание: {note['description']}")
+    print(f"Дата создания: {note['creation_date']}")
+    print(f"Дата завершения: {note['end_date']}")
+    print("Заголовки:")
+    for header in note['headers']:
+        print(f"- {header}")
+    print("-" * 20)
 
 
-def display_all_notes(notes): # Функция для работы с сохраненными заметками
+def change_status(notes):
+
+    # Функция для изменения статуса заметки.
+
     if not notes:
-        print("\nЗаметок пока нет.")
+        print("Нет заметок для изменения.")
         return
 
-    print("\nСписок всех заметок:")
-    for i, note in enumerate(notes, 1):
-        print(f"\n{i}. Заметка:")
-        display_note(note)
+    change_by = input("Изменить заметку по имени пользователя (u) или заголовку (h)? (u/h): ").lower()
 
-
-def change_status(note): # Функция для работы со статусами заметок
-    statuses = ['выполнено', 'в процессе', 'отложено']
-    print("\nТекущий статус:", note['status'])
-    print("Доступные статусы:")
-    for i, status in enumerate(statuses, 1):
-        print(f"{i}. {status}")
-
-    while True:
-        try:
-            choice = int(input("Выберите новый статус (1-3): "))
-            if 1 <= choice <= 3:
-                note['status'] = statuses[choice - 1]
-                print("Статус успешно изменен!")
+    if change_by == 'u':
+        user_name = input("Введите имя пользователя заметки, статус которой вы хотите изменить: ")
+        found_note = None
+        for note in notes:
+            if note['user_name'] == user_name:
+                found_note = note
                 break
-        except ValueError:
-            pass
-        print("Неверный выбор. Попробуйте снова.")
-
-
-def check_deadline(note): # Функция для проверки дедлайна заметок
-    current_date = datetime.now()
-    deadline = datetime.strptime(note['deadline_date'], '%d.%m.%Y')
-    days_left = (deadline - current_date).days
-
-    print("\nПроверка дедлайна:")
-    if days_left < 0:
-        print("Дедлайн просрочен!")
-    elif days_left == 0:
-        print("Дедлайн сегодня!")
+        if not found_note:
+            print("Заметка с таким именем пользователя не найдена.")
+            return
+        new_status = get_status()
+        found_note['status'] = new_status
+        print("Статус заметки успешно изменен.")
+    elif change_by == 'h':
+        header_to_change = input("Введите заголовок заметки, статус которой вы хотите изменить: ")
+        found_note = None
+        for note in notes:
+            if header_to_change in note['headers']:
+                found_note = note
+                break
+        if not found_note:
+            print("Заметка с таким заголовком не найдена.")
+            return
+        new_status = get_status()
+        found_note['status'] = new_status
+        print("Статус заметки успешно изменен.")
     else:
-        print(f"До дедлайна осталось {days_left} дней")
+        print("Некорректный ввод. Пожалуйста, выберите 'u' или 'h'.")
 
+def main():
+    # Основная функция программы, реализующая меню и управление заметками."
 
-def select_note(notes): # Функция для просмотра заметок
-    if not notes:
-        print("\nЗаметок пока нет.")
-        return None
-
-    display_all_notes(notes)
-    while True:
-        try:
-            choice = int(input("\nВыберите номер заметки: "))
-            if 1 <= choice <= len(notes):
-                return notes[choice - 1]
-        except ValueError:
-            pass
-        print("Неверный выбор. Попробуйте снова.")
-
-
-def main(): # Меню для работы с заметками
-    notes = load_notes()
+    notes = []
+    note_id_counter = 1  # Счетчик ID заметок
 
     while True:
-        print("\nГлавное меню:")
-        print("1. Создать новую заметку")
-        print("2. Показать все заметки")
+        print("\nМеню:")
+        print("1. Создать заметку")
+        print("2. Просмотреть все заметки")
         print("3. Изменить статус заметки")
-        print("4. Проверить дедлайн заметки")
-        print("5. Выход")
+        print("4. Выйти")
 
-        choice = input("Выберите действие (1-5): ")
+        choice = input("Выберите действие: ")
 
         if choice == '1':
-            new_note = get_user_input()
-            notes.append(new_note)
-            save_notes(notes)
-            print("Заметка успешно создана и сохранена!")
-
+            note = create_note(note_id_counter)
+            notes.append(note)
+            print("Заметка создана!")
+            note_id_counter += 1
         elif choice == '2':
-            display_all_notes(notes)
-
+            if not notes:
+                print("Нет заметок для просмотра.")
+            else:
+                for note in notes:
+                    display_note(note)
         elif choice == '3':
-            note = select_note(notes)
-            if note:
-                change_status(note)
-                save_notes(notes)
-
+            change_status(notes)
         elif choice == '4':
-            note = select_note(notes)
-            if note:
-                check_deadline(note)
-
-        elif choice == '5':
-            print("Программа завершена.")
+            print("Выход из программы.")
             break
-
         else:
             print("Неверный выбор. Попробуйте снова.")
 
