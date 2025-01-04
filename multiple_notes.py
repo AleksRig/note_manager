@@ -92,6 +92,8 @@ def display_note(note):
         print(f"- {header}")
     print("-" * 20)
 
+    check_deadline(note)
+
 
 def change_status(notes):
 
@@ -131,6 +133,27 @@ def change_status(notes):
         print("Статус заметки успешно изменен.")
     else:
         print("Некорректный ввод. Пожалуйста, выберите 'u' или 'h'.")
+
+def check_deadline(note):
+
+        # Функция для проверки дедлайна заметки и вывода сообщения.
+
+    creation_date_str = note['creation_date']
+    end_date_str = note['end_date']
+
+    creation_date_obj = datetime.datetime.strptime(creation_date_str, "%d-%m").date()
+    end_date_obj = datetime.datetime.strptime(end_date_str, "%d-%m").date()
+
+    if end_date_obj < creation_date_obj:
+        print("!!! Ошибка: Дата завершения раньше даты создания !!!")
+    elif end_date_obj == creation_date_obj:
+        print("!!! Дедлайн сегодня !!!")
+    else:
+        days_left = (end_date_obj - datetime.date.today()).days
+        if days_left < 0:
+            print("!!! Дедлайн прошел !!!")
+        else:
+            print(f"До дедлайна осталось: {days_left} дней")
 
 def main():
     # Основная функция программы, реализующая меню и управление заметками."
