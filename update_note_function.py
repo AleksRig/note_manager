@@ -83,6 +83,7 @@ def display_note(note):
 
 
 def check_deadline(note):
+
     # Функция для проверки дедлайна заметки и вывода сообщения.
 
     creation_date_str = note['creation_date']
@@ -91,17 +92,14 @@ def check_deadline(note):
     creation_date_obj = datetime.datetime.strptime(creation_date_str, "%d-%m").date()
     end_date_obj = datetime.datetime.strptime(end_date_str, "%d-%m").date()
 
+    days_left = (end_date_obj - creation_date_obj).days
+
     if end_date_obj < creation_date_obj:
-        print("!!! Ошибка: Дата завершения раньше даты создания !!!")
+        print("!!! Дедлайн прошел !!!")
     elif end_date_obj == creation_date_obj:
         print("!!! Дедлайн сегодня !!!")
-    else:
-        days_left = (end_date_obj - datetime.date.today()).days
-        if days_left < 0:
-            print("!!! Дедлайн прошел !!!")
-        else:
-            print(f"До дедлайна осталось: {days_left} дней")
-
+    elif end_date_obj > creation_date_obj:
+        print(f"До дедлайна осталось: {days_left} дней")
 
 def change_status(notes):
     # Функция для изменения статуса заметки.
