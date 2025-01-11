@@ -95,7 +95,7 @@ def check_deadline(note):
     days_left = (end_date_obj - creation_date_obj).days
 
     if end_date_obj < creation_date_obj:
-        print("!!! Дедлайн прошел !!!")
+        print(f"!!! Дедлайн прошел {-days_left} дней назад !!!")
     elif end_date_obj == creation_date_obj:
         print("!!! Дедлайн сегодня !!!")
     elif end_date_obj > creation_date_obj:
