@@ -134,20 +134,21 @@ def change_status(notes):
 
 
 def check_deadline(note):
-    
     # Функция для проверки дедлайна заметки и вывода сообщения.
 
-    end_date_str = note['end_date']  # Получаем строку даты
-    end_date_obj = datetime.datetime.strptime(end_date_str, "%d-%m").date()  # Преобразовываем строку в объект date
+    creation_date_str = note['creation_date']
+    end_date_str = note['end_date']
 
-    today = datetime.date.today()  # Получаем текущую дату
+    creation_date_obj = datetime.datetime.strptime(creation_date_str, "%d-%m").date()
+    end_date_obj = datetime.datetime.strptime(end_date_str, "%d-%m").date()
 
-    if end_date_obj < today:
+    days_left = (end_date_obj - creation_date_obj).days
+
+    if end_date_obj < creation_date_obj:
         print("!!! Дедлайн прошел !!!")
-    elif end_date_obj == today:
+    elif end_date_obj == creation_date_obj:
         print("!!! Дедлайн сегодня !!!")
-    else:
-        days_left = (end_date_obj - today).days
+    elif end_date_obj > creation_date_obj:
         print(f"До дедлайна осталось: {days_left} дней")
 
 def main():
